@@ -15,26 +15,26 @@ int print_pointer(va_list types, char buffer[],
 	int flags, int width, int precision, int size)
 {
 	char extra_c = 0, padd = ' ';
-	int ind = BUFF_SIZE - 2, length = 2, padd_start = 1; /* length=2, for '0x' */
-	unsigned long num_addrs;
+	int indd = BUFF_SIZE - 2, length = 2, padd_start = 1; /* length=2, for '0x' */
+	unsigned long num_address;
 	char map_to[] = "0123456789abcdef";
-	void *addrs = va_arg(types, void *);
+	void *address = va_arg(types, void *);
 
 	UNUSED(width);
 	UNUSED(size);
 
-	if (addrs == NULL)
+	if (address == NULL)
 		return (write(1, "(nil)", 5));
 
 	buffer[BUFF_SIZE - 1] = '\0';
 	UNUSED(precision);
 
-	num_addrs = (unsigned long)addrs;
+	num_address = (unsigned long)address;
 
-	while (num_addrs > 0)
+	while (num_address > 0)
 	{
-		buffer[ind--] = map_to[num_addrs % 16];
-		num_addrs /= 16;
+		buffer[indd--] = map_to[num_address % 16];
+		num_address /= 16;
 		length++;
 	}
 
@@ -45,9 +45,9 @@ int print_pointer(va_list types, char buffer[],
 	else if (flags & F_SPACE)
 		extra_c = ' ', length++;
 
-	ind++;
+	indd++;
 
-	/*return (write(1, &buffer[i], BUFF_SIZE - i - 1));*/
+	/*return (write(1, &buffer[p], BUFF_SIZE - p - 1));*/
 	return (write_pointer(buffer, ind, length,
 		width, flags, padd, extra_c, padd_start));
 }
@@ -66,30 +66,30 @@ int print_pointer(va_list types, char buffer[],
 int print_non_printable(va_list types, char buffer[],
 	int flags, int width, int precision, int size)
 {
-	int x = 0, offset = 0;
-	char *str = va_arg(types, char *);
+	int p = 0, offset = 0;
+	char *strr = va_arg(types, char *);
 
 	UNUSED(flags);
 	UNUSED(width);
 	UNUSED(precision);
 	UNUSED(size);
 
-	if (str == NULL)
+	if (strr == NULL)
 		return (write(1, "(null)", 6));
 
-	while (str[x] != '\0')
+	while (strr[p] != '\0')
 	{
-		if (is_printable(str[x]))
-			buffer[x + offset] = str[x];
+		if (is_printable(strr[p]))
+			buffer[p + offset] = strr[p];
 		else
-			offset += append_hexa_code(str[x], buffer, x + offset);
+			offset += append_hexa_code(strr[p], buffer, p + offset);
 
-		x++;
+		p++;
 	}
 
-	buffer[x + offset] = '\0';
+	buffer[p + offset] = '\0';
 
-	return (write(1, buffer, x + offset));
+	return (write(1, buffer, p + offset));
 }
 
 /************************* PRINT REVERSE *************************/
@@ -107,28 +107,28 @@ int print_non_printable(va_list types, char buffer[],
 int print_reverse(va_list types, char buffer[],
 	int flags, int width, int precision, int size)
 {
-	char *str;
-	int x, count = 0;
+	char *strr;
+	int p, count = 0;
 
 	UNUSED(buffer);
 	UNUSED(flags);
 	UNUSED(width);
 	UNUSED(size);
 
-	str = va_arg(types, char *);
+	strr = va_arg(types, char *);
 
-	if (str == NULL)
+	if (strr == NULL)
 	{
 		UNUSED(precision);
 
-		str = ")Null(";
+		strr = ")Null(";
 	}
-	for (x = 0; str[x]; x++)
+	for (p = 0; strr[p]; p++)
 		;
 
-	for (i = x - 1; x >= 0; x--)
+	for (p = p - 1; p >= 0; p--)
 	{
-		char z = str[x];
+		char z = strr[p];
 
 		write(1, &z, 1);
 		count++;
@@ -149,38 +149,38 @@ int print_reverse(va_list types, char buffer[],
 int print_rot13string(va_list types, char buffer[],
 	int flags, int width, int precision, int size)
 {
-	char a;
-	char *str;
-	unsigned int w, y;
+	char x;
+	char *strr;
+	unsigned int p, q;
 	int count = 0;
-	char in[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-	char out[] = "NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm";
+	char in_arr[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	char out_arr[] = "NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm";
 
-	str = va_arg(types, char *);
+	strr = va_arg(types, char *);
 	UNUSED(buffer);
 	UNUSED(flags);
 	UNUSED(width);
 	UNUSED(precision);
 	UNUSED(size);
 
-	if (str == NULL)
-		str = "(AHYY)";
-	for (w = 0; str[w]; w++)
+	if (strr == NULL)
+		strr = "(AHYY)";
+	for (p = 0; strr[p]; p++)
 	{
-		for (y = 0; in[y]; y++)
+		for (q = 0; in_arr[q]; q++)
 		{
-			if (in[y] == str[w])
+			if (in_arr[q] == strr[p])
 			{
-				a = out[y];
-				write(1, &a, 1);
+				x = out_arr[q];
+				write(1, &x, 1);
 				count++;
 				break;
 			}
 		}
-		if (!in[y])
+		if (!in_arr[q])
 		{
-			a = str[w];
-			write(1, &a, 1);
+			x = strr[p];
+			write(1, &x, 1);
 			count++;
 		}
 	}
